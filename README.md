@@ -38,7 +38,7 @@ graph TD
 * **Interactive Workspace Tabs**:
   * **Answer**: Displays real-time streaming completions formatted in clean Markdown, citations, tables, and related questions.
   * **Links**: Renders a clean, deduplicated grid of every single domain reference crawled during the active thread session.
-* **Smart XML-Like Response Parser**: Automatically decodes and parses `<ANSWER>` and `<FOLLOW_UPS>` suggestions in real-time, allowing users to click follow-up questions to query further in history context.
+* **Smart XML-Like Response Parser**: Automatically decodes and parses `` `<ANSWER>` `` and `` `<FOLLOW_UPS>` `` suggestions in real-time, allowing users to click follow-up questions to query further in history context.
 * **OAuth Security**: User registration, login, and sessions are securely managed via Supabase GitHub OAuth.
 * **Secure JWT Middleware**: Private backend routes require a valid Supabase JWT in the `Authorization` header. The middleware lazily syncs verified users into the Postgres database, preventing constraint collisions.
 * **Side-Docked Navigation**: Fast access to conversation histories (loaded via `GET /conversations`) with individual item deletion support (`DELETE /conversation/:id`).
