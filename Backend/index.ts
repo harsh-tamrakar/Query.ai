@@ -338,6 +338,9 @@ ${query}
 
 
 
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+// Use Render's PORT env var in production, fallback to 3000 for local dev
+const PORT = parseInt(process.env.PORT || "3000", 10);
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
