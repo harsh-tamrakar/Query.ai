@@ -10,13 +10,16 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.79",
     "@prisma/adapter-pg": "^7.8.0",
     "@supabase/supabase-js": "^2.106.2",
     "@tavily/core": "^0.7.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.20.0",
+    "ai": "^6.0.191",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "pg": "^8.21.0"
   }
