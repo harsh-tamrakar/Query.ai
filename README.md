@@ -52,16 +52,58 @@ graph TD
 
 ---
 
-## 🛠️ Setup & Running Instructions
+## 🛠️ Local Installation & Setup
 
-We have separated local development configurations and production test workflows into dedicated directories:
+Ensure you have the [Bun runtime](https://bun.sh/) installed on your machine.
 
-### 💻 Running the App Locally (No Code/URL Changes Needed)
-For a step-by-step setup to clone, configure, and launch the frontend and backend servers locally on your machine, see the **[Local Development Guide (local/run_locally.md)](file:///e:/Perplexity/local/run_locally.md)**.
-- Note: The frontend automatically detects if it is running on `localhost` and routes API calls to the local port, so you do not need to rewrite any backend endpoint URLs in config files when switching environments!
+### 1. Configure & Run Backend
+Navigate to the `Backend` directory and install dependencies:
+```bash
+cd Backend
+bun install
+```
+Create a `.env` file based on `.env.example` and fill out the required variables:
+```env
+DATABASE_URL="postgresql://..." # Your PostgreSQL Database URL
+DIRECT_URL="postgresql://..."   # Direct connection URL (for migrations)
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_SECRET_KEY="your-supabase-service-role-key"
+GEMINI_API_KEY="your-google-gemini-key"
+TAVILY_API_KEY="your-tavily-search-key"
+GITHUB_OAUTH_CLIENT_ID="your-github-client-id"
+GITHUB_OAUTH_SECRET="your-github-client-secret"
+```
+Start the index server in hot-reload mode:
+```bash
+bun --hot index.ts
+```
+The backend API server will listen on **`http://localhost:3000`**.
+
+### 2. Configure & Run Frontend
+Navigate to the `Frontend` directory and install dependencies:
+```bash
+cd ../Frontend
+bun install
+```
+Create a `.env` file based on `.env.example`:
+```env
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_ANON_KEY="your-supabase-anon-key"
+```
+Start the client development server:
+```bash
+bun dev
+```
+Open **`http://localhost:5173`** (or the printed port) in your browser.
+
+> [!NOTE]
+> **Dynamic URL Resolution (No Code Changes Needed!):**
+> The frontend automatically detects where it is running. If it runs on `localhost` or `127.0.0.1`, it directs API calls to the local backend `http://localhost:3000`. In production, it targets the live Render backend (`https://query-ai-gwj8.onrender.com`). You do not need to change any URLs before pushing to GitHub!
+
+---
 
 ### 📦 Verifying the App in Production Mode
-For testing how the frontend builds, minifies, and serves assets under production conditions (`NODE_ENV=production`) using Bun's static serving and SPA client fallback logic, see the **[Production Verification Test Script (production/verify_production.ts)](file:///e:/Perplexity/production/verify_production.ts)**.
+For testing how the frontend builds, minifies, and serves assets under production conditions (`NODE_ENV=production`) using Bun's static serving and SPA client fallback logic, see the **[Production Verification Test Script (production/verify_production.ts)](file:///e:/Perplexity/production/verify_production.ts)** (kept local/untracked).
 - You can run the production test suite locally using:
   ```bash
   bun run production/verify_production.ts
