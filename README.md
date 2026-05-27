@@ -1,6 +1,12 @@
 # Query AI 🚀
 ### The Next-Generation Synthesized AI Search Engine
 
+> [!TIP]
+> **Live Production Deployments:**
+> - **Frontend Site (Render):** [https://query-ai-1.onrender.com](https://query-ai-1.onrender.com)
+> - **Backend API Server (Render):** [https://query-ai-gwj8.onrender.com](https://query-ai-gwj8.onrender.com)
+> - **Database & Auth Integration:** Hosted PostgreSQL & GitHub OAuth via Supabase
+
 Query AI is a high-fidelity, premium dark-mode Perplexity clone built using the **Bun runtime**, **React**, **Express**, **Prisma ORM**, and **Google Gemini LLM**. It delivers a real-time, cited search experience that crawls the web, aggregates reliable sources, structures answers in markdown grids, and suggests context-aware follow-up questions.
 
 ---
@@ -46,66 +52,20 @@ graph TD
 
 ---
 
-###  🛠️ Installation & Setup
+## 🛠️ Setup & Running Instructions
 
-Ensure you have [Bun](https://bun.sh/) installed on your machine.
+We have separated local development configurations and production test workflows into dedicated directories:
 
-### 1. Clone & Configure Backend
-Navigate to the `Backend` directory:
-```bash
-cd Backend
-bun install
-```
-Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
-Fill out the required variables:
-```env
-DATABASE_URL="postgresql://..."
-DIRECT_URL="postgresql://..."
-SUPABASE_URL="https://your-project.supabase.co"
-SUPABASE_SECRET_KEY="your-service-role-key"
-GEMINI_API_KEY="your-gemini-key"
-TAVILY_API_KEY="your-tavily-key"
-GITHUB_OAUTH_CLIENT_ID="your-client-id"
-GITHUB_OAUTH_SECRET="your-client-secret"
-```
+### 💻 Running the App Locally (No Code/URL Changes Needed)
+For a step-by-step setup to clone, configure, and launch the frontend and backend servers locally on your machine, see the **[Local Development Guide (local/run_locally.md)](file:///e:/Perplexity/local/run_locally.md)**.
+- Note: The frontend automatically detects if it is running on `localhost` and routes API calls to the local port, so you do not need to rewrite any backend endpoint URLs in config files when switching environments!
 
-### 2. Configure Frontend
-Navigate to the `Frontend` directory:
-```bash
-cd ../Frontend
-bun install
-```
-Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
-Fill out the client connection details (or utilize the pre-configured sandbox keys):
-```env
-SUPABASE_URL="https://your-project.supabase.co"
-SUPABASE_ANON_KEY="your-publishable-anon-key"
-BACKEND_URL="http://localhost:3000"
-```
-
----
-
-## 🚀 Running the Project
-
-### Start Backend Dev Server
-In the `Backend` directory, start the index server in hot-reload mode:
-```bash
-bun --hot index.ts
-```
-The server will boot on `http://localhost:3000`.
-
-### Start Frontend Dev Server
-In the `Frontend` directory, start the client server:
-```bash
-bun dev
-```
-Open `http://localhost:5173` in your browser to access **Query AI**.
+### 📦 Verifying the App in Production Mode
+For testing how the frontend builds, minifies, and serves assets under production conditions (`NODE_ENV=production`) using Bun's static serving and SPA client fallback logic, see the **[Production Verification Test Script (production/verify_production.ts)](file:///e:/Perplexity/production/verify_production.ts)**.
+- You can run the production test suite locally using:
+  ```bash
+  bun run production/verify_production.ts
+  ```
 
 ---
 
