@@ -5,7 +5,7 @@ import path from "node:path";
 const outdir = path.join(process.cwd(), "dist");
 await rm(outdir, { recursive: true, force: true });
 
-const entrypoints = [...new Bun.Glob("src/**/*.html").scanSync()];
+const entrypoints = ["index.html"];
 
 const result = await Bun.build({
   entrypoints,
