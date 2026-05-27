@@ -5,7 +5,7 @@ FROM oven/bun:1
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lock* ./
+COPY package.json bun.lock* bunfig.toml ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
@@ -13,12 +13,8 @@ RUN bun install --frozen-lockfile
 # Copy all source code
 COPY . .
 
-# Build the static assets
-RUN bun run build
-
 # Expose port
 EXPOSE 3000
 
-# Start the Bun server in production mode
-ENV NODE_ENV=production
+# Start the Bun server
 CMD ["bun", "src/index.ts"]
