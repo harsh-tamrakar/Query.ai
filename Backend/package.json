@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "prisma": "^7.8.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -12,6 +13,7 @@
   "dependencies": {
     "@ai-sdk/google": "^3.0.79",
     "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@supabase/supabase-js": "^2.106.2",
     "@tavily/core": "^0.7.3",
     "@types/cors": "^2.8.19",

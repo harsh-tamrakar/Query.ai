@@ -46,7 +46,7 @@ graph TD
 
 ---
 
-## 🛠️ Installation & Setup
+###  🛠️ Installation & Setup
 
 Ensure you have [Bun](https://bun.sh/) installed on your machine.
 
