@@ -10,6 +10,7 @@ const entrypoints = ["index.html"];
 const result = await Bun.build({
   entrypoints,
   outdir,
+  publicPath: "/",
   plugins: [tailwind],
   minify: true,
   target: "browser",

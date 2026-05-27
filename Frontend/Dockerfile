@@ -13,6 +13,12 @@ RUN bun install --frozen-lockfile
 # Copy all source code
 COPY . .
 
+# Build the application
+RUN bun run build
+
+# Set environment to production
+ENV NODE_ENV=production
+
 # Expose port
 EXPOSE 3000
 
