@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { createClient } from "../lib/client";
+import { BACKEND_URL } from "../lib/config";
 import { ArrowLeft, Sparkles, Check, Wallet, ShieldCheck, Zap, CreditCard } from "lucide-react";
 import { type User } from "@supabase/supabase-js";
 
@@ -35,7 +36,7 @@ export default function Upgrade() {
       try {
         const session = await supabase.auth.getSession();
         const token = session.data.session?.access_token;
-        const res = await fetch("http://localhost:3000/payments/config", {
+        const res = await fetch(`${BACKEND_URL}/payments/config`, {
           headers: {
             "Authorization": token ? token : "",
           }
@@ -65,7 +66,7 @@ export default function Upgrade() {
   const verifyPayment = async (paymentDetails: any) => {
     try {
       setProcessing(true);
-      const response = await fetch("http://localhost:3000/payments/webhook", {
+      const response = await fetch(`${BACKEND_URL}/payments/webhook`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +98,7 @@ export default function Upgrade() {
       const token = session.data.session?.access_token;
 
       // 1. Create order on our backend
-      const response = await fetch("http://localhost:3000/payments/create-order", {
+      const response = await fetch(`${BACKEND_URL}/payments/create-order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -161,7 +162,7 @@ export default function Upgrade() {
 
     try {
       // Send mock success webhook call to our backend
-      const response = await fetch("http://localhost:3000/payments/webhook", {
+      const response = await fetch(`${BACKEND_URL}/payments/webhook`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
