@@ -18,12 +18,18 @@ datasource db {
 // defining schema of the backend
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique 
-  provider      Authprovider
-  name          String
-  supabaseId    String         
-  Conversation  Conversation[]
+  id               String         @id @default(uuid())
+  email            String         @unique 
+  provider         Authprovider
+  name             String
+  supabaseId       String         
+  Conversation     Conversation[]
+  
+  // Billing fields
+  billingTier      BillingTier    @default(FREE)
+  credits          Int            @default(0)
+  lastResetDate    DateTime       @default(now())
+  payments         Payment[]
 }
 
 model Conversation {
@@ -52,4 +58,37 @@ enum MessageRole {
 enum Authprovider {
   Github
   Google
+  Email
+}
+
+enum BillingTier {
+  FREE
+  PRO
+}
+
+enum ProductType {
+  SUBSCRIPTION
+  TOPUP
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  orderId      String        @unique
+  paymentId    String?
+  amount       Int
+  currency     String        @default("INR")
+  status       PaymentStatus @default(PENDING)
+  productType  ProductType
+  creditsAdded Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }

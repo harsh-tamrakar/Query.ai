@@ -242,6 +242,10 @@ export default function Dashboard() {
   const [streamingAnswer, setStreamingAnswer] = useState("");
   const [activeSources, setActiveSources] = useState<Array<{ url: string }>>([]);
   const [activeFollowUps, setActiveFollowUps] = useState<string[]>([]);
+  
+  // Billing States
+  const [billingTier, setBillingTier] = useState<"FREE" | "PRO">("FREE");
+  const [credits, setCredits] = useState<number>(0);
 
   // Focus & Model states
   const [selectedFocus, setSelectedFocus] = useState("All");
@@ -282,9 +286,26 @@ export default function Dashboard() {
     }
   }
 
+  async function fetchBilling() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const jwt = session?.access_token;
+      if (!jwt) return;
+
+      const response = await axios.get(`${BACKEND_URL}/user/billing`, {
+        headers: { Authorization: jwt }
+      });
+      setBillingTier(response.data.billingTier);
+      setCredits(response.data.credits);
+    } catch (error) {
+      console.error("Error fetching billing:", error);
+    }
+  }
+
   useEffect(() => {
     if (user) {
       loadConversations();
+      fetchBilling();
     }
   }, [user]);
 
@@ -393,6 +414,17 @@ export default function Dashboard() {
         body: JSON.stringify(body)
       });
 
+      if (response.status === 402) {
+        const errData = await response.json();
+        if (confirm(errData.message || "Search limit reached. Purchase credits or upgrade to Pro?")) {
+          navigate("/upgrade");
+        }
+        // Remove optimistic user message
+        setActiveMessages(prev => prev.slice(0, -1));
+        setIsStreaming(false);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP Error ${response.status}`);
       }
@@ -427,8 +459,9 @@ export default function Dashboard() {
       setActiveMessages(prev => [...prev, tempAssistantMsg]);
       setStreamingAnswer("");
 
-      // Refresh conversations list so the sidebar updates
+      // Refresh conversations and billing status so credit counters update
       await loadConversations();
+      await fetchBilling();
 
     } catch (error: any) {
       console.error("Stream ask error:", error);
@@ -588,6 +621,33 @@ export default function Dashboard() {
 
         {/* Sidebar Bottom Upgrade and Profile Row */}
         <div className="mt-4 flex flex-col gap-3">
+          
+          {/* Billing / Upgrade Card */}
+          <div className="bg-[#0e0e0e] border border-neutral-900/60 p-3 rounded-2xl flex flex-col gap-2.5 transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] uppercase font-bold tracking-wider text-neutral-500">Plan Status</span>
+              <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                billingTier === "PRO" 
+                  ? "bg-emerald-950 text-emerald-400 border border-emerald-900/30" 
+                  : "bg-indigo-950 text-indigo-400 border border-indigo-900/30"
+              }`}>
+                {billingTier === "PRO" ? "PRO MEMBER" : "FREE TIER"}
+              </span>
+            </div>
+            {billingTier !== "PRO" && (
+              <div className="flex items-center justify-between text-xs select-none">
+                <span className="text-neutral-400">Search Credits:</span>
+                <span className="font-bold text-neutral-200">{credits} left</span>
+              </div>
+            )}
+            <button
+              onClick={() => navigate("/upgrade")}
+              className="w-full py-2 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition cursor-pointer text-center shadow-md"
+            >
+              Upgrade / Topup
+            </button>
+          </div>
+
           <div className="relative">
             <div
               onClick={() => navigate("/profile")}

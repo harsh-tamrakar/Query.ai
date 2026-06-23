@@ -1,7 +1,7 @@
 import { serve } from "bun";
 import { join } from "node:path";
 
-const port = parseInt(process.env.PORT || "3000");
+const port = parseInt(process.env.PORT || "5173");
 
 let server;
 
@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === "production") {
   });
 } else {
   // In development, serve the root index.html dynamically with HMR
-  const index = require("../index.html").default;
+  const index = require("../index.html");
   console.log(`Running in DEVELOPMENT mode. Serving dynamically...`);
 
   server = serve({

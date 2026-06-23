@@ -1,10 +1,12 @@
 import middleware, { type AuthenticatedRequest } from "./middleware";
+import { checkBillingLimit } from "./billingMiddleware";
 import { prisma } from "./db";
 import { tavily } from '@tavily/core';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
 import dotenv from 'dotenv';
 import { SYSTEM_PROMPT, PROMPT_TEMPLATE } from './prompt';
+import crypto from "crypto";
 
 import cors from "cors";
 
@@ -65,7 +67,7 @@ app.get("/conversation/:conversationId", middleware, async (req: AuthenticatedRe
     }
 
     const conversation = await prisma.conversation.findUnique({
-      where: { id: conversationId },
+      where: { id: conversationId as string },
       include: {
         messages: {
           orderBy: { createdAt: "asc" }
@@ -96,7 +98,7 @@ app.delete("/conversation/:conversationId", middleware, async (req: Authenticate
     }
 
     const conversation = await prisma.conversation.findUnique({
-      where: { id: conversationId }
+      where: { id: conversationId as string }
     });
 
     if (!conversation || conversation.userId !== dbUser.id) {
@@ -120,7 +122,7 @@ app.delete("/conversation/:conversationId", middleware, async (req: Authenticate
   }
 });
 
-app.post("/query_ai_ask", middleware, async (req: AuthenticatedRequest, res) => {
+app.post("/query_ai_ask", middleware, checkBillingLimit, async (req: AuthenticatedRequest, res) => {
   try {
     const { query, conversationId } = req.body;
     if (!query) {
@@ -226,7 +228,7 @@ app.post("/query_ai_ask", middleware, async (req: AuthenticatedRequest, res) => 
   }
 });
 
-app.post("/query_ai_ask/follow_up", middleware, async (req: AuthenticatedRequest, res) => {
+app.post("/query_ai_ask/follow_up", middleware, checkBillingLimit, async (req: AuthenticatedRequest, res) => {
   try {
     const { query, conversationId } = req.body;
     if (!query || !conversationId) {
@@ -335,8 +337,192 @@ ${query}
   }
 });
 
+// ==========================================
+// 💳 PAYMENT AND BILLING ENDPOINTS (JUSPAY / RAZORPAY COMPATIBLE)
+// ==========================================
 
+// 1. Get Billing Status
+app.get("/user/billing", middleware, async (req: AuthenticatedRequest, res) => {
+  try {
+    const dbUser = await prisma.user.findFirst({
+      where: { supabaseId: req.userId }
+    });
+    if (!dbUser) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+    res.json({
+      billingTier: dbUser.billingTier,
+      credits: dbUser.credits,
+      email: dbUser.email,
+      name: dbUser.name
+    });
+  } catch (error: any) {
+    console.error("❌ Error fetching billing:", error);
+    res.status(500).json({ error: "Internal server error during billing fetch" });
+  }
+});
 
+// 2. Create Order / Session
+app.post("/payments/create-order", middleware, async (req: AuthenticatedRequest, res) => {
+  try {
+    const { productType } = req.body; // "SUBSCRIPTION" or "TOPUP"
+    if (!productType || (productType !== "SUBSCRIPTION" && productType !== "TOPUP")) {
+      return res.status(400).json({ error: "Invalid productType. Must be SUBSCRIPTION or TOPUP" });
+    }
+
+    const dbUser = await prisma.user.findFirst({
+      where: { supabaseId: req.userId }
+    });
+    if (!dbUser) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+
+    const amount = 100; // Both query ai pro and credit topup cost ₹1 (100 paise)
+    const creditsAdded = productType === "TOPUP" ? 50 : 0;
+    
+    // Generate a unique Order ID (simulating Razorpay)
+    const orderId = `order_${crypto.randomBytes(6).toString("hex")}`;
+
+    // Record the pending payment in database
+    await prisma.payment.create({
+      data: {
+        userId: dbUser.id,
+        orderId,
+        amount,
+        currency: "INR",
+        status: "PENDING",
+        productType,
+        creditsAdded
+      }
+    });
+
+    res.json({
+      orderId,
+      amount,
+      currency: "INR",
+      productType,
+      user: {
+        name: dbUser.name,
+        email: dbUser.email
+      }
+    });
+  } catch (error: any) {
+    console.error("❌ Error creating payment order:", error);
+    res.status(500).json({ error: "Internal server error during order creation" });
+  }
+});
+
+// 3. Webhook for Payment Success (Razorpay style)
+app.post("/payments/webhook", async (req, res) => {
+  try {
+    console.log("📥 Webhook payload received:", req.body);
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, mock_success, orderId } = req.body;
+
+    // Support both production-grade Razorpay verification AND a sandbox simulation bypass for testing
+    let finalOrderId = razorpay_order_id || orderId;
+    let finalPaymentId = razorpay_payment_id || `pay_${crypto.randomBytes(6).toString("hex")}`;
+    
+    // Real Razorpay Signature Validation if headers/signature and order_id are present
+    const webhookSecret = process.env.PAYMENT_WEBHOOK_SECRET || "sandbox_secret";
+    if (razorpay_signature && razorpay_order_id) {
+      const generatedSignature = crypto
+        .createHmac("sha256", webhookSecret)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest("hex");
+
+      if (generatedSignature !== razorpay_signature) {
+        return res.status(400).json({ error: "Invalid signature verification" });
+      }
+    } else if (!mock_success && !razorpay_payment_id) {
+      return res.status(400).json({ error: "Missing verification parameters" });
+    }
+
+    if (!finalOrderId) {
+      return res.status(400).json({ error: "Missing orderId parameter" });
+    }
+
+    // Process the payment updates in database transaction
+    const result = await prisma.$transaction(async (tx) => {
+      const paymentRecord = await tx.payment.findUnique({
+        where: { orderId: finalOrderId }
+      });
+
+      if (!paymentRecord) {
+        throw new Error("Payment record not found");
+      }
+
+      if (paymentRecord.status === "SUCCESS") {
+        return { message: "Already processed" };
+      }
+
+      // Update payment state
+      await tx.payment.update({
+        where: { orderId: finalOrderId },
+        data: {
+          status: "SUCCESS",
+          paymentId: finalPaymentId
+        }
+      });
+
+      // Update user entitlements
+      if (paymentRecord.productType === "SUBSCRIPTION") {
+        await tx.user.update({
+          where: { id: paymentRecord.userId },
+          data: {
+            billingTier: "PRO"
+          }
+        });
+      } else if (paymentRecord.productType === "TOPUP") {
+        await tx.user.update({
+          where: { id: paymentRecord.userId },
+          data: {
+            credits: {
+              increment: paymentRecord.creditsAdded
+            }
+          }
+        });
+      }
+
+      return { message: "Payment processed successfully" };
+    });
+
+    res.json(result);
+  } catch (error: any) {
+    console.error("❌ Webhook error:", error.message);
+    res.status(500).json({ error: error.message || "Internal server error during webhook processing" });
+  }
+});
+
+// 4. Query Payment Status
+app.get("/payments/status/:orderId", middleware, async (req: AuthenticatedRequest, res) => {
+  try {
+    const { orderId } = req.params;
+    const paymentRecord = await prisma.payment.findUnique({
+      where: { orderId: orderId as string }
+    });
+
+    if (!paymentRecord) {
+      return res.status(404).json({ error: "Payment order not found" });
+    }
+
+    res.json({
+      orderId: paymentRecord.orderId,
+      status: paymentRecord.status,
+      productType: paymentRecord.productType,
+      amount: paymentRecord.amount
+    });
+  } catch (error: any) {
+    console.error("❌ Error checking status:", error);
+    res.status(500).json({ error: "Internal server error checking payment status" });
+  }
+});
+
+// 5. Get Payment Config
+app.get("/payments/config", middleware, async (req: AuthenticatedRequest, res) => {
+  res.json({
+    razorpayKeyId: process.env.VITE_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || ""
+  });
+});
 
 // Use Render's PORT env var in production, fallback to 3000 for local dev
 const PORT = parseInt(process.env.PORT || "3000", 10);

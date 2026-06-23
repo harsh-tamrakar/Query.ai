@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Upgrade from "./pages/Upgrade";
 import logo from "./logo.svg";
 import reactLogo from "./react.svg";
 
@@ -17,6 +18,7 @@ export function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/upgrade" element={<Upgrade />} />
         </Routes>
       </BrowserRouter>
     </div>

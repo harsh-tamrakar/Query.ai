@@ -20,6 +20,7 @@ const result = await Bun.build({
     "process.env.SUPABASE_URL": JSON.stringify(process.env.SUPABASE_URL || ""),
     "process.env.SUPABASE_ANON_KEY": JSON.stringify(process.env.SUPABASE_ANON_KEY || ""),
     "process.env.BACKEND_URL": JSON.stringify(process.env.BACKEND_URL || "http://localhost:3000"),
+    "process.env.VITE_RAZORPAY_KEY_ID": JSON.stringify(process.env.VITE_RAZORPAY_KEY_ID || ""),
   },
 });
 

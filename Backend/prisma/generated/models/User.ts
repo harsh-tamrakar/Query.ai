@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  credits: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  credits: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -30,6 +40,9 @@ export type UserMinAggregateOutputType = {
   provider: $Enums.Authprovider | null
   name: string | null
   supabaseId: string | null
+  billingTier: $Enums.BillingTier | null
+  credits: number | null
+  lastResetDate: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -38,6 +51,9 @@ export type UserMaxAggregateOutputType = {
   provider: $Enums.Authprovider | null
   name: string | null
   supabaseId: string | null
+  billingTier: $Enums.BillingTier | null
+  credits: number | null
+  lastResetDate: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -46,9 +62,20 @@ export type UserCountAggregateOutputType = {
   provider: number
   name: number
   supabaseId: number
+  billingTier: number
+  credits: number
+  lastResetDate: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  credits?: true
+}
+
+export type UserSumAggregateInputType = {
+  credits?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -56,6 +83,9 @@ export type UserMinAggregateInputType = {
   provider?: true
   name?: true
   supabaseId?: true
+  billingTier?: true
+  credits?: true
+  lastResetDate?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -64,6 +94,9 @@ export type UserMaxAggregateInputType = {
   provider?: true
   name?: true
   supabaseId?: true
+  billingTier?: true
+  credits?: true
+  lastResetDate?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -72,6 +105,9 @@ export type UserCountAggregateInputType = {
   provider?: true
   name?: true
   supabaseId?: true
+  billingTier?: true
+  credits?: true
+  lastResetDate?: true
   _all?: true
 }
 
@@ -113,6 +149,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -143,6 +191,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -153,7 +203,12 @@ export type UserGroupByOutputType = {
   provider: $Enums.Authprovider
   name: string
   supabaseId: string
+  billingTier: $Enums.BillingTier
+  credits: number
+  lastResetDate: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -182,7 +237,11 @@ export type UserWhereInput = {
   provider?: Prisma.EnumAuthproviderFilter<"User"> | $Enums.Authprovider
   name?: Prisma.StringFilter<"User"> | string
   supabaseId?: Prisma.StringFilter<"User"> | string
+  billingTier?: Prisma.EnumBillingTierFilter<"User"> | $Enums.BillingTier
+  credits?: Prisma.IntFilter<"User"> | number
+  lastResetDate?: Prisma.DateTimeFilter<"User"> | Date | string
   Conversation?: Prisma.ConversationListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -191,7 +250,11 @@ export type UserOrderByWithRelationInput = {
   provider?: Prisma.SortOrder
   name?: Prisma.SortOrder
   supabaseId?: Prisma.SortOrder
+  billingTier?: Prisma.SortOrder
+  credits?: Prisma.SortOrder
+  lastResetDate?: Prisma.SortOrder
   Conversation?: Prisma.ConversationOrderByRelationAggregateInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -203,7 +266,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   provider?: Prisma.EnumAuthproviderFilter<"User"> | $Enums.Authprovider
   name?: Prisma.StringFilter<"User"> | string
   supabaseId?: Prisma.StringFilter<"User"> | string
+  billingTier?: Prisma.EnumBillingTierFilter<"User"> | $Enums.BillingTier
+  credits?: Prisma.IntFilter<"User"> | number
+  lastResetDate?: Prisma.DateTimeFilter<"User"> | Date | string
   Conversation?: Prisma.ConversationListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -212,9 +279,14 @@ export type UserOrderByWithAggregationInput = {
   provider?: Prisma.SortOrder
   name?: Prisma.SortOrder
   supabaseId?: Prisma.SortOrder
+  billingTier?: Prisma.SortOrder
+  credits?: Prisma.SortOrder
+  lastResetDate?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -226,6 +298,9 @@ export type UserScalarWhereWithAggregatesInput = {
   provider?: Prisma.EnumAuthproviderWithAggregatesFilter<"User"> | $Enums.Authprovider
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
   supabaseId?: Prisma.StringWithAggregatesFilter<"User"> | string
+  billingTier?: Prisma.EnumBillingTierWithAggregatesFilter<"User"> | $Enums.BillingTier
+  credits?: Prisma.IntWithAggregatesFilter<"User"> | number
+  lastResetDate?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
 export type UserCreateInput = {
@@ -234,7 +309,11 @@ export type UserCreateInput = {
   provider: $Enums.Authprovider
   name: string
   supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
   Conversation?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -243,7 +322,11 @@ export type UserUncheckedCreateInput = {
   provider: $Enums.Authprovider
   name: string
   supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
   Conversation?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -252,7 +335,11 @@ export type UserUpdateInput = {
   provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
   name?: Prisma.StringFieldUpdateOperationsInput | string
   supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Conversation?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -261,7 +348,11 @@ export type UserUncheckedUpdateInput = {
   provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
   name?: Prisma.StringFieldUpdateOperationsInput | string
   supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Conversation?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -270,6 +361,9 @@ export type UserCreateManyInput = {
   provider: $Enums.Authprovider
   name: string
   supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
 }
 
 export type UserUpdateManyMutationInput = {
@@ -278,6 +372,9 @@ export type UserUpdateManyMutationInput = {
   provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
   name?: Prisma.StringFieldUpdateOperationsInput | string
   supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -286,6 +383,9 @@ export type UserUncheckedUpdateManyInput = {
   provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
   name?: Prisma.StringFieldUpdateOperationsInput | string
   supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -294,6 +394,13 @@ export type UserCountOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   name?: Prisma.SortOrder
   supabaseId?: Prisma.SortOrder
+  billingTier?: Prisma.SortOrder
+  credits?: Prisma.SortOrder
+  lastResetDate?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  credits?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -302,6 +409,9 @@ export type UserMaxOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   name?: Prisma.SortOrder
   supabaseId?: Prisma.SortOrder
+  billingTier?: Prisma.SortOrder
+  credits?: Prisma.SortOrder
+  lastResetDate?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -310,6 +420,13 @@ export type UserMinOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   name?: Prisma.SortOrder
   supabaseId?: Prisma.SortOrder
+  billingTier?: Prisma.SortOrder
+  credits?: Prisma.SortOrder
+  lastResetDate?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  credits?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -323,6 +440,22 @@ export type StringFieldUpdateOperationsInput = {
 
 export type EnumAuthproviderFieldUpdateOperationsInput = {
   set?: $Enums.Authprovider
+}
+
+export type EnumBillingTierFieldUpdateOperationsInput = {
+  set?: $Enums.BillingTier
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type UserCreateNestedOneWithoutConversationInput = {
@@ -339,12 +472,30 @@ export type UserUpdateOneRequiredWithoutConversationNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConversationInput, Prisma.UserUpdateWithoutConversationInput>, Prisma.UserUncheckedUpdateWithoutConversationInput>
 }
 
+export type UserCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPaymentsInput, Prisma.UserUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPaymentsInput, Prisma.UserUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.UserUpsertWithoutPaymentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPaymentsInput, Prisma.UserUpdateWithoutPaymentsInput>, Prisma.UserUncheckedUpdateWithoutPaymentsInput>
+}
+
 export type UserCreateWithoutConversationInput = {
   id?: string
   email: string
   provider: $Enums.Authprovider
   name: string
   supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationInput = {
@@ -353,6 +504,10 @@ export type UserUncheckedCreateWithoutConversationInput = {
   provider: $Enums.Authprovider
   name: string
   supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationInput = {
@@ -377,6 +532,10 @@ export type UserUpdateWithoutConversationInput = {
   provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
   name?: Prisma.StringFieldUpdateOperationsInput | string
   supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationInput = {
@@ -385,6 +544,74 @@ export type UserUncheckedUpdateWithoutConversationInput = {
   provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
   name?: Prisma.StringFieldUpdateOperationsInput | string
   supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPaymentsInput = {
+  id?: string
+  email: string
+  provider: $Enums.Authprovider
+  name: string
+  supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
+  Conversation?: Prisma.ConversationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPaymentsInput = {
+  id?: string
+  email: string
+  provider: $Enums.Authprovider
+  name: string
+  supabaseId: string
+  billingTier?: $Enums.BillingTier
+  credits?: number
+  lastResetDate?: Date | string
+  Conversation?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPaymentsInput, Prisma.UserUncheckedCreateWithoutPaymentsInput>
+}
+
+export type UserUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPaymentsInput, Prisma.UserUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPaymentsInput, Prisma.UserUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPaymentsInput, Prisma.UserUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type UserUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  Conversation?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumAuthproviderFieldUpdateOperationsInput | $Enums.Authprovider
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  supabaseId?: Prisma.StringFieldUpdateOperationsInput | string
+  billingTier?: Prisma.EnumBillingTierFieldUpdateOperationsInput | $Enums.BillingTier
+  credits?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  Conversation?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -394,10 +621,12 @@ export type UserUncheckedUpdateWithoutConversationInput = {
 
 export type UserCountOutputType = {
   Conversation: number
+  payments: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Conversation?: boolean | UserCountOutputTypeCountConversationArgs
+  payments?: boolean | UserCountOutputTypeCountPaymentsArgs
 }
 
 /**
@@ -417,6 +646,13 @@ export type UserCountOutputTypeCountConversationArgs<ExtArgs extends runtime.Typ
   where?: Prisma.ConversationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -424,7 +660,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   provider?: boolean
   name?: boolean
   supabaseId?: boolean
+  billingTier?: boolean
+  credits?: boolean
+  lastResetDate?: boolean
   Conversation?: boolean | Prisma.User$ConversationArgs<ExtArgs>
+  payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -434,6 +674,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   provider?: boolean
   name?: boolean
   supabaseId?: boolean
+  billingTier?: boolean
+  credits?: boolean
+  lastResetDate?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -442,6 +685,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   provider?: boolean
   name?: boolean
   supabaseId?: boolean
+  billingTier?: boolean
+  credits?: boolean
+  lastResetDate?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -450,11 +696,15 @@ export type UserSelectScalar = {
   provider?: boolean
   name?: boolean
   supabaseId?: boolean
+  billingTier?: boolean
+  credits?: boolean
+  lastResetDate?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "provider" | "name" | "supabaseId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "provider" | "name" | "supabaseId" | "billingTier" | "credits" | "lastResetDate", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Conversation?: boolean | Prisma.User$ConversationArgs<ExtArgs>
+  payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -464,6 +714,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     Conversation: Prisma.$ConversationPayload<ExtArgs>[]
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -471,6 +722,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     provider: $Enums.Authprovider
     name: string
     supabaseId: string
+    billingTier: $Enums.BillingTier
+    credits: number
+    lastResetDate: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -866,6 +1120,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   Conversation<T extends Prisma.User$ConversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ConversationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payments<T extends Prisma.User$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -900,6 +1155,9 @@ export interface UserFieldRefs {
   readonly provider: Prisma.FieldRef<"User", 'Authprovider'>
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly supabaseId: Prisma.FieldRef<"User", 'String'>
+  readonly billingTier: Prisma.FieldRef<"User", 'BillingTier'>
+  readonly credits: Prisma.FieldRef<"User", 'Int'>
+  readonly lastResetDate: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 
@@ -1314,6 +1572,30 @@ export type User$ConversationArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * User.payments
+ */
+export type User$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**

@@ -32,3 +32,8 @@ export type Conversation = Prisma.ConversationModel
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel

@@ -19,7 +19,34 @@ export type MessageRole = (typeof MessageRole)[keyof typeof MessageRole]
 
 export const Authprovider = {
   Github: 'Github',
-  Google: 'Google'
+  Google: 'Google',
+  Email: 'Email'
 } as const
 
 export type Authprovider = (typeof Authprovider)[keyof typeof Authprovider]
+
+
+export const BillingTier = {
+  FREE: 'FREE',
+  PRO: 'PRO'
+} as const
+
+export type BillingTier = (typeof BillingTier)[keyof typeof BillingTier]
+
+
+export const ProductType = {
+  SUBSCRIPTION: 'SUBSCRIPTION',
+  TOPUP: 'TOPUP'
+} as const
+
+export type ProductType = (typeof ProductType)[keyof typeof ProductType]
+
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]

@@ -29,15 +29,42 @@ export default async function middleware(req: AuthenticatedRequest, res: Respons
                 where: { email: userEmail }
             });
 
-            if (!existingUser && userEmail) {
-                await prisma.user.create({
-                    data: {
-                        email: userEmail,
-                        supabaseId: userId,
-                        provider: data.data.user?.app_metadata.provider === "google" ? "Google" : "Github",
-                        name: data.data.user?.user_metadata.name || data.data.user?.user_metadata.full_name || userEmail || "User"
+            let dbUser = existingUser;
+
+            if (!dbUser && userEmail) {
+                const metaProvider = data.data.user?.app_metadata.provider;
+                const providerVal = metaProvider === "google" ? "Google" : (metaProvider === "github" ? "Github" : "Email");
+
+                try {
+                    dbUser = await prisma.user.create({
+                        data: {
+                            email: userEmail,
+                            supabaseId: userId,
+                            provider: providerVal,
+                            name: data.data.user?.user_metadata.name || data.data.user?.user_metadata.full_name || userEmail || "User",
+                            credits: 5 // Start with 5 free query credits
+                        }
+                    });
+                } catch (createError: any) {
+                    // Handle race condition: if another concurrent request created this user in the last millisecond
+                    if (createError.code === "P2002") {
+                        dbUser = await prisma.user.findUnique({
+                            where: { email: userEmail }
+                        });
+                    } else {
+                        throw createError;
                     }
-                });
+                }
+            }
+
+            if (dbUser) {
+                // Keep the database supabaseId synced if the user switches login methods (GitHub vs Email/Password)
+                if (dbUser.supabaseId !== userId) {
+                    await prisma.user.update({
+                        where: { id: dbUser.id },
+                        data: { supabaseId: userId }
+                    });
+                }
             }
 
             req.userId = userId;

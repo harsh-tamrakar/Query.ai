@@ -3,6 +3,8 @@ import { type User } from "@supabase/supabase-js";
 import { useNavigate } from "react-router";
 import { createClient } from "../lib/client";
 import { Sparkles, User as UserIcon, Mail, LogOut, ArrowLeft, Calendar } from "lucide-react";
+import axios from "axios";
+import { BACKEND_URL } from "../lib/config";
 
 const supabase = createClient();
 
@@ -10,6 +12,10 @@ export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Billing states
+  const [billingTier, setBillingTier] = useState<"FREE" | "PRO">("FREE");
+  const [credits, setCredits] = useState<number>(0);
 
   const displayName = user?.email ? user.email.split("@")[0] : "User";
   const userInitials = displayName
@@ -25,6 +31,7 @@ export default function Profile() {
       const { data, error } = await supabase.auth.getUser();
       if (data?.user) {
         setUser(data.user);
+        await fetchBilling();
       } else {
         navigate("/auth");
       }
@@ -33,6 +40,22 @@ export default function Profile() {
         console.warn("Profile auth error:", error.message);
       }
     }
+    
+    async function fetchBilling() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const jwt = session?.access_token;
+        if (!jwt) return;
+        const response = await axios.get(`${BACKEND_URL}/user/billing`, {
+          headers: { Authorization: jwt }
+        });
+        setBillingTier(response.data.billingTier);
+        setCredits(response.data.credits);
+      } catch (error) {
+        console.error("Error fetching billing in profile:", error);
+      }
+    }
+
     checkAuth();
   }, [navigate]);
 
@@ -119,6 +142,33 @@ export default function Profile() {
               </div>
             </div>
             <Calendar className="w-4 h-4 text-neutral-500" />
+          </div>
+
+          {/* Billing Plan & Balance Row */}
+          <div className="flex items-center gap-4 bg-neutral-900/40 border border-neutral-900 p-4 rounded-2xl">
+            <div className="flex-1">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 mb-0.5">Billing Plan</div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                  billingTier === "PRO"
+                    ? "bg-emerald-950 text-emerald-400 border border-emerald-900/50"
+                    : "bg-indigo-950 text-indigo-400 border border-indigo-900/50"
+                }`}>
+                  {billingTier === "PRO" ? "PRO MEMBER" : "FREE TIER"}
+                </span>
+                {billingTier !== "PRO" && (
+                  <span className="text-xs font-semibold text-neutral-300">
+                    ({credits} Search Credits left)
+                  </span>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => navigate("/upgrade")}
+              className="px-3.5 py-1.5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-850 hover:border-neutral-800 text-xs font-bold rounded-xl transition cursor-pointer"
+            >
+              Manage Billing
+            </button>
           </div>
 
         </div>
