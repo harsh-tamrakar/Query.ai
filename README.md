@@ -192,25 +192,25 @@ create trigger on_auth_user_created
 The following screenshots showcase the premium dark-mode interface and rich features of **Query AI**:
 
 ### 🔐 1. Authentication (GitHub OAuth / Clean Credentials Sign-In Screen)
-![Authentication](screenshots/login_page.png)
+![Authentication](screenshots/Auth.png)
 
 ### 🏠 2. Landing Dashboard (Sleek Query Input, History Side-Dock, Plan Badge)
-![Landing Dashboard](screenshots/landing_dashboard.png)
+![Landing Dashboard](screenshots/Dashboard.png)
 
 ### 💬 3. Synthesized Answer (Real-time Citations & Remaining Credits Counter)
-![Answer Citations](screenshots/answer_citations.png)
+![Answer Citations](screenshots/answer_citation.png)
 
 ### 🔗 4. Reference Links Grid (Deduplicated Source Cards Layout)
-![Reference Links Grid](screenshots/reference_links_grid.png)
+![Reference Links Grid](screenshots/reference_link_grid.png)
 
 ### 👤 5. User Account Profile (Avatar Initials & Billing Account Management)
 ![User Profile](screenshots/user_profile.png)
 
 ### 💳 6. Checkout Plan Selector (Upgrade plans & Wallet refill cards)
-![Checkout Plans](screenshots/checkout_plans.jpg)
+![Checkout Plans](screenshots/checkout_plans.png)
 
 ### 🛡️ 7. Razorpay Payment Gateway (Test UPI, cards, and netbanking options)
-![Razorpay Checkout](screenshots/razorpay_checkout.jpg)
+![Razorpay Checkout](screenshots/razorpay_checkout.png)
 
 ### 🎉 8. Payment Success (Real-time webhook verified upgrade completion)
-![Payment Success](screenshots/payment_success.jpg)
+![Payment Success](screenshots/payment_success.png)
