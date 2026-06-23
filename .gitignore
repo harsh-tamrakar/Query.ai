@@ -6,3 +6,5 @@ dist/
 
 # Internal developer documentation (local only)
 documents/
+local/
+production/
